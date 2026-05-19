@@ -150,6 +150,10 @@ button {
     padding-top: 12px;
 }
 
+#clear {
+    background-color: #ef4444;
+}
+
 footer {
     margin-top: 18px;
     color: #6b7280;
