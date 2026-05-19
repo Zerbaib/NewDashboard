@@ -138,6 +138,18 @@ button {
         opacity: 0.5
     }
 
+.folder {
+    background-color: #e5e7eb;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    margin-top: 12px;
+    border-radius: 10px;
+}
+
+.folder-header {
+    padding-top: 12px;
+}
+
 footer {
     margin-top: 18px;
     color: #6b7280;

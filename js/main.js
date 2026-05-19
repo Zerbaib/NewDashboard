@@ -67,6 +67,7 @@ function render() {
 	const groups = ['__unsorted__', ...folders];
 	groups.forEach(group => {
 		const section = document.createElement('div');
+		section.className = 'folder';
 		const title = document.createElement('h3');
 		title.className = 'folder-header';
 		title.draggable = group !== '__unsorted__';
@@ -93,37 +94,67 @@ function render() {
 	populateFolderSelect();
 }
 
-// delegated drag handling for folder grids
+// delegated drag handling for grids and folders
 document.addEventListener('dragover', (e) => {
 	e.preventDefault();
 	const dragging = document.querySelector('.dragging');
-	const allGrids = [...document.querySelectorAll('.grid')];
-	const targetGrid = allGrids.find(g => g.contains(dragging) || g.contains(e.target));
-	if (!dragging || !targetGrid) return;
-	const after = getDragAfterElement(targetGrid, e.clientY);
-	if (after == null) targetGrid.appendChild(dragging);
-	else targetGrid.insertBefore(dragging, after);
+	if (!dragging) return;
+
+	if (dragging.classList.contains('tile')) {
+		const targetGrid = e.target.closest('.grid');
+		if (!targetGrid) return;
+		const after = getDragAfterElement(targetGrid, e.clientY, '.tile:not(.dragging)');
+		if (after == null) targetGrid.appendChild(dragging);
+		else targetGrid.insertBefore(dragging, after);
+	} else if (dragging.classList.contains('folder-header')) {
+		const container = document.getElementById('foldersContainer');
+		const draggingFolder = dragging.closest('.folder');
+		const after = getDragAfterElement(container, e.clientY, '.folder:not(:first-child)');
+		
+		if (after && after === container.firstElementChild) return;
+		
+		if (after == null) container.appendChild(draggingFolder);
+		else container.insertBefore(draggingFolder, after);
+	}
 });
 
 document.addEventListener('drop', (e) => {
 	e.preventDefault();
-	const fromIndex = Number(e.dataTransfer.getData('text/plain'));
 	const draggingEl = document.querySelector('.dragging');
 	if (!draggingEl) return;
-	const targetGrid = draggingEl.parentElement;
-	const nodes = Array.from(targetGrid.children).filter(n => n.classList.contains('tile'));
-	const toIndex = nodes.indexOf(draggingEl);
-	if (toIndex < 0) return;
-	const [moved] = items.splice(fromIndex, 1);
-	// assign folder based on target grid
-	const group = targetGrid.dataset.group || '__unsorted__';
-	moved.folder = group === '__unsorted__' ? undefined : group;
-	items.splice(toIndex, 0, moved);
-	save(); render();
+
+	if (draggingEl.classList.contains('folder-header')) {
+		const targetContainer = document.getElementById('foldersContainer');
+		const folderNodes = Array.from(targetContainer.querySelectorAll('.folder-header'))
+			.map(h => h.dataset.folderName)
+			.filter(n => n && n !== '__unsorted__');
+		
+		folders = folderNodes;
+		saveFolders();
+		render();
+		return;
+	}
+
+	if (draggingEl.classList.contains('tile')) {
+		const fromIndex = Number(e.dataTransfer.getData('text/plain'));
+		const targetGrid = draggingEl.parentElement;
+		const nodes = Array.from(targetGrid.children).filter(n => n.classList.contains('tile'));
+		const toIndex = nodes.indexOf(draggingEl);
+		
+		if (toIndex < 0 || isNaN(fromIndex)) return;
+		
+		const [moved] = items.splice(fromIndex, 1);
+		const group = targetGrid.dataset.group || '__unsorted__';
+		moved.folder = group === '__unsorted__' ? undefined : group;
+		items.splice(toIndex, 0, moved);
+		save(); render();
+	}
 });
 
-function getDragAfterElement(container, y) {
-	const draggableElements = [...container.querySelectorAll('.tile:not(.dragging)')];
+function getDragAfterElement(container, y, selector) {
+	const draggingEl = document.querySelector('.dragging');
+	const draggableElements = [...container.querySelectorAll(selector)].filter(el => !el.contains(draggingEl));
+	
 	return draggableElements.reduce((closest, child) => {
 		const box = child.getBoundingClientRect();
 		const offset = y - box.top - box.height / 2;
