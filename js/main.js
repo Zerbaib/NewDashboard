@@ -147,7 +147,7 @@ addBtn.addEventListener('click', () => {
 	save(); render(); document.getElementById('title').value = ''; document.getElementById('url').value = '';
 });
 
-clearBtn.addEventListener('click', () => { if (confirm('Clear all items?')) { items = []; save(); render(); } });
+clearBtn.addEventListener('click', () => { if (confirm('Clear all items?')) { items = []; folders = []; save(); saveFolders(); render(); } });
 
 // allow pressing Enter in url field to add
 document.getElementById('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') addBtn.click(); });
