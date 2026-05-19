@@ -111,7 +111,7 @@ document.addEventListener('dragover', (e) => {
 		const draggingFolder = dragging.closest('.folder');
 		const after = getDragAfterElement(container, e.clientY, '.folder:not(:first-child)');
 		
-		if (after && after === container.firstElementChild) return; // Ne pas insérer avant "Unsorted"
+		if (after && after === container.firstElementChild) return;
 		
 		if (after == null) container.appendChild(draggingFolder);
 		else container.insertBefore(draggingFolder, after);
