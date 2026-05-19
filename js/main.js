@@ -67,6 +67,7 @@ function render() {
 	const groups = ['__unsorted__', ...folders];
 	groups.forEach(group => {
 		const section = document.createElement('div');
+		section.className = 'folder';
 		const title = document.createElement('h3');
 		title.className = 'folder-header';
 		title.draggable = group !== '__unsorted__';
