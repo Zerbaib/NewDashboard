@@ -97,9 +97,9 @@ function render() {
 document.addEventListener('dragover', (e) => {
 	e.preventDefault();
 	const dragging = document.querySelector('.dragging');
-	const allGrids = [...document.querySelectorAll('.grid')];
-	const targetGrid = allGrids.find(g => g.contains(dragging) || g.contains(e.target));
-	if (!dragging || !targetGrid) return;
+	if (!dragging || !dragging.classList.contains('tile')) return;
+	const targetGrid = e.target.closest('.grid');
+	if (!targetGrid) return;
 	const after = getDragAfterElement(targetGrid, e.clientY);
 	if (after == null) targetGrid.appendChild(dragging);
 	else targetGrid.insertBefore(dragging, after);
