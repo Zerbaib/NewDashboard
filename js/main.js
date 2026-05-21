@@ -178,6 +178,44 @@ addBtn.addEventListener('click', () => {
 	save(); render(); document.getElementById('title').value = ''; document.getElementById('url').value = '';
 });
 
+document.getElementById('exportJSON').addEventListener('click', () => {
+	const data = { items, folders };
+	const json = JSON.stringify(data, null, 2);
+	const blob = new Blob([json], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = 'dashboard-backup.json';
+	a.click();
+	URL.revokeObjectURL(url);
+});
+
+document.getElementById('importJSON').addEventListener('click', () => {
+	document.getElementById('importInput').click();
+});
+
+document.getElementById('importInput').addEventListener('change', (e) => {
+	const file = e.target.files[0];
+	if (!file) return;
+
+	const reader = new FileReader();
+	reader.onload = (event) => {
+		try {
+			const data = JSON.parse(event.target.result);
+			if (data.items && Array.isArray(data.items)) items = data.items;
+			if (data.folders && Array.isArray(data.folders)) folders = data.folders;
+			save();
+			saveFolders();
+			render();
+			alert('Data imported successfully!');
+		} catch (err) {
+			alert('Failed to parse JSON file.');
+		}
+	};
+	reader.readAsText(file);
+	e.target.value = ''; // reset for next import
+});
+
 clearBtn.addEventListener('click', () => { if (confirm('Clear all items?')) { items = []; folders = []; save(); saveFolders(); render(); } });
 
 // allow pressing Enter in url field to add

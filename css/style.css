@@ -144,10 +144,15 @@ button {
     padding-bottom: 20px;
     margin-top: 12px;
     border-radius: 10px;
+    padding-right: 20px;
 }
 
 .folder-header {
     padding-top: 12px;
+}
+
+#clear {
+    background-color: #ef4444;
 }
 
 footer {
